@@ -3,5 +3,6 @@ git config --global user.email danivianadecarvalho@gmail.com
 
 npx create-expo-app@latest calculadora --template blank
 cd calculadora
+npm i (Cmd)
 
 npx expo start --android
