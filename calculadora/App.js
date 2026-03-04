@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { StyleSheet, Text, View, StatusBar, Pressable  } from 'react-native';
 
-import CalcButto from './components/CalcButton';
+import CalcButton from './components/CalcButton';
 import Display from './components/Display';
 import { themes } from "./theme/token";
 import { createEngine } from "./utils/calcEngine";
@@ -34,7 +34,7 @@ export default function App() {
 
         <Display 
           theme={theme}
-          expression={""}
+          expression={"100+"}
           value={0}
         />
 
