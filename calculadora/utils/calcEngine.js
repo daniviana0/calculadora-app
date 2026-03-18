@@ -16,12 +16,81 @@ export function createEngine({ locale = "pt-BR"} = {}) {
 
     function reduce(state, key) {
         const s = { ...state, lastKey: key };
-        // Programar
+        
+        // helpers
+        const current = toNumber(s.display);
+        const setDisplayNumber = (n) => {
+            s.display = formatNumber(n, locale);
+        }
+
+        // Digit or Dot
+        if (isDigit(key) || key === ".") {
+            return onDigitOrDot(s, key, locale);
+        }
+
+        // Clear
+        if (key === "C") {
+            return initialState();
+        }
+
+        // Sign 
+        if(key === "SIGN") {
+            if (!Number.isFinite(current)) return s;
+            setDisplayNumber(current * -1);
+            s.isNewEntry = false;
+            return s;
+        }
+
+        // Percent
+        if(key === "%") {
+            if (!Number.isFinite(current)) return s;
+            setDisplayNumber(current / 100);
+            s.isNewEntry = true;
+            s.expression = `${formatNumber(current, locale)} %`;
+            return s;
+        }
+
+        //Operator
+        if (OPS.has(key)) {
+            return onOperator(s.locale);
+        }
+
+        // Equal
+        if (key === "=") {
+            return onEqual(s, locale);
+        }
+
         return s;
     }
 
     function onDigitOrDot(s, key, locale) {
+        const raw = displayToRaw(s.display);
 
+        let nextRaw;
+        if (s.isNewEntry) {
+            nextRaw = key === "." ? "0." : key;
+            s.isNewEntry = false;
+        } else {
+            if(key === "." & raw.includes(".")) return s;
+            nextRaw = raw === "0" && key !== "." ? key : raw + key;
+        }
+
+        if (nextRaw.replace("-", "").length > 14) return s;
+
+        const n = Number(nextRaw);
+        if (!Number.isFinite(n)) {
+            s.display = "Erro";
+            s.isNewEntry = true;
+            return s;
+        }
+
+        if (nextRaw.endsWith(".")) {
+            s.display = formatNumber(n, locale).replace(/0$/, "") + ",";
+            return s;
+        }
+
+        s.display = formatNumber(n, locale)
+        return s;
     }
 
     function onOperator(s, op, locale) {
